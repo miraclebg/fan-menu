@@ -1,19 +1,19 @@
 import Foundation
 import Macaw
 
-public struct FanMenuButton {
-    public let id: String
-    public let image: String
-    public let color: Color
+@objcMembers public class FanMenuButton : NSObject {
+    public var id: String
+    public var image: String
+    public var color: Int
     
-    public init(id: String, image: String, color: Color) {
-        self.id = id
-        self.image = image
-        self.color = color
+    override init() {
+        self.id = "";
+        self.image = "";
+        self.color = 0;
     }
 }
 
-public class FanMenu: MacawView {
+@objcMembers public class FanMenu: MacawView {
     
     public var duration = 0.20 {
         didSet {
@@ -51,7 +51,13 @@ public class FanMenu: MacawView {
         }
     }
     
-    public var interval: (Double, Double) = (0, 2.0 * Double.pi) {
+    public var interval1 = 0.0 {
+        didSet {
+            updateNode()
+        }
+    }
+    
+    public var interval2 = 2.0 * Double.pi {
         didSet {
             updateNode()
         }
@@ -101,13 +107,9 @@ public class FanMenu: MacawView {
         self.node = node
         self.scene = scene
     }
-    
-    open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        return findNodeAt(location: point) != nil
-    }
 }
 
-class FanMenuScene {
+@objcMembers class FanMenuScene {
     
     let fanMenu: FanMenu
     
@@ -126,11 +128,12 @@ class FanMenuScene {
         
         menuCircle = Shape(
             form: Circle(r: fanMenu.radius),
-            fill: button.color
+            fill: Color.blue
+            /*fill: button.color*/
         )
         
         buttonNode = [menuCircle].group()
-        if !button.image.isEmpty, let uiImage = UIImage(named: button.image) {
+        if let uiImage = UIImage(named: button.image) {
             menuIcon = Image(
                 src: button.image,
                 place: Transform.move(
@@ -145,7 +148,7 @@ class FanMenuScene {
         
         buttonsNode = fanMenu.items.map {
             return FanMenuScene.createFanButtonNode(button: $0, fanMenu: fanMenu)
-        }.group()
+            }.group()
         
         
         backgroundCircle = Shape(
@@ -155,7 +158,8 @@ class FanMenuScene {
         if let color = fanMenu.menuBackground {
             backgroundCircle.fill = color
         } else {
-            backgroundCircle.fill = button.color.with(a: 0.2)
+            backgroundCircle.fill = Color.blue.with(a: 0.2)
+            /*backgroundCircle.fill = button.color.with(a: 0.2)*/
         }
         
         node = [backgroundCircle, buttonsNode, buttonNode].group()
@@ -187,7 +191,7 @@ class FanMenuScene {
         if open == isOpen {
             return
         }
-
+        
         isOpen = open
         
         let scale = isOpen ? fanMenu.menuRadius / fanMenu.radius : fanMenu.radius / fanMenu.menuRadius
@@ -204,18 +208,18 @@ class FanMenuScene {
                 node.placeVar.animation(
                     to: transform,
                     during: fanMenu.duration
-                ).easing(Easing.easeOut)
-            ].combine()
+                    ).easing(Easing.easeOut)
+                ].combine()
             
             let delay = fanMenu.delay * Double(index)
             if delay == 0.0 {
                 return mainAnimation
             }
-
+            
             let filterOpacity = isOpen ? 0.0 : 1.0
             let fillerAnimation = node.opacityVar.animation(from: filterOpacity, to: filterOpacity, during: delay)
             return [fillerAnimation, mainAnimation].sequence()
-        }.combine()
+            }.combine()
         
         // stub
         let buttonAnimation = self.buttonNode.opacityVar.animation(
@@ -229,16 +233,17 @@ class FanMenuScene {
         }
         animation?.play()
     }
-
+    
     
     class func createFanButtonNode(button: FanMenuButton, fanMenu: FanMenu) -> Group {
         var contents: [Node] = [
             Shape(
                 form: Circle(r: fanMenu.radius),
-                fill: button.color
+                fill: Color.blue
+                /*fill: button.color*/
             )
         ]
-        if !button.image.isEmpty, let uiImage = UIImage(named: button.image) {
+        if let uiImage = UIImage(named: button.image) {
             let image = Image(
                 src: button.image,
                 place: Transform.move(
@@ -263,8 +268,8 @@ class FanMenuScene {
     
     func expandPlace(index: Int) -> Transform {
         let size = Double(buttonsNode.contents.count)
-        let endValue = fanMenu.interval.1
-        let startValue = fanMenu.interval.0
+        let endValue = fanMenu.interval1
+        let startValue = fanMenu.interval2
         let interval = endValue - startValue
         
         var step: Double = 0.0
