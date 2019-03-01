@@ -127,8 +127,8 @@ import Macaw
         let button = fanMenu.button!
         
         menuCircle = Shape(
-            form: Circle(r: fanMenu.radius),
-            fill: Color.blue
+            form: Circle(r: fanMenu.radius)/*,
+            fill: Color.blue*/
             /*fill: button.color*/
         )
         
@@ -158,7 +158,7 @@ import Macaw
         if let color = fanMenu.menuBackground {
             backgroundCircle.fill = color
         } else {
-            backgroundCircle.fill = Color.blue.with(a: 0.2)
+            /*backgroundCircle.fill = Color.blue.with(a: 0.2)*/
             /*backgroundCircle.fill = button.color.with(a: 0.2)*/
         }
         
@@ -238,8 +238,8 @@ import Macaw
     class func createFanButtonNode(button: FanMenuButton, fanMenu: FanMenu) -> Group {
         var contents: [Node] = [
             Shape(
-                form: Circle(r: fanMenu.radius),
-                fill: Color.blue
+                form: Circle(r: fanMenu.radius)/*,
+                fill: Color.blue*/
                 /*fill: button.color*/
             )
         ]
